@@ -9,25 +9,36 @@ class Deck extends Component {
   constructor(props) {
     super(props);
 
+    const position = new Animated.ValueXY();
+
     const panResponder = PanResponder.create({
       onStartShouldSetPanResponder: (evt, gestureState) => true,
       onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
       onMoveShouldSetPanResponder: (evt, gestureState) => true,
       onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
-
       onPanResponderMove: (evt, gestureState) => {
+        position.setValue({ x: gestureState.dx, y:gestureState.dy });
       },
-      onPanResponderRelease: () => {
-        // console.log('two');
-      }
+      onPanResponderRelease: () => {}
     });
 
-    this.state = { panResponder }
+    this.state = { panResponder, position };
   }
+
   renderCards() {
-    return this.props.data.map(item => {
-      // console.log('yo');
-      return this.props.renderCard(item);
+    return this.props.data.map((item, index) => {
+      if (index === 0) {
+        return (
+          <Animated.View
+            key={item.id}
+            style={this.state.position.getLayout() }
+            {...this.state.panResponder.panHandlers}
+          >
+            {this.props.renderCard(item)}
+          </Animated.View>
+        )
+      }
+      // return this.props.renderCard(item);
     });
   }
 
@@ -36,7 +47,7 @@ class Deck extends Component {
     // console.log(...this.state.panResponder.panHandlers);
 
     return(
-      <View {...this.state.panResponder.panHandlers}>
+      <View>
         { this.renderCards() }
       </View>
     );
