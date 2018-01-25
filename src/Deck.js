@@ -3,7 +3,9 @@ import {
   View,
   Animated,
   PanResponder,
-  Dimensions
+  Dimensions,
+  LayoutAnimation,
+  UIManager
 } from 'react-native';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -43,6 +45,17 @@ class Deck extends Component {
     });
 
     this.state = { panResponder, position, index : 0 };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.data !== this.props.data) {
+      this.setState({ index : 0 })
+    }
+  }
+
+  componentWillUpdate() {
+    UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
+    LayoutAnimation.spring();
   }
 
   forceSwipe(direction) {
@@ -107,11 +120,14 @@ class Deck extends Component {
       }
 
       return (
-        <View key={item.id} style={styles.cardStyle}>
+        <Animated.View
+          key={item.id}
+          style={[styles.cardStyle, { top: 10 * (i - this.state.index) }]}
+            >
           { this.props.renderCard(item) }
-        </View>
+        </Animated.View>
       )
-    });
+    }).reverse();
   }
 
   render() {
@@ -125,7 +141,11 @@ class Deck extends Component {
 
 const styles = {
   cardStyle: {
-    position: 'absolute'
+    position: 'absolute',
+    width: SCREEN_WIDTH,
+    // left: 0, it is css trick instead of set width
+    // right: 0 it means dist on left and right side is 0
+    // in react-native it is not very nice to use it, better width : SCREEN_WIDTH
   }
 }
 
