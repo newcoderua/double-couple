@@ -49,7 +49,7 @@ class Deck extends Component {
 
   componentWillReceiveProps(nextProps) {
     if(nextProps.data !== this.props.data) {
-      this.setState({ index : 0 })
+      this.setState({ index : 0   })
     }
   }
 
